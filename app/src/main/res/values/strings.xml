@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Travel Notifier</string>
+    <string name="activity_title">Place Select</string>
+    <string name="action_settings">Help</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_place_select">Places</string>
+    <string name="title_back">Back</string>
+    <string name="title_activity_google_places">GooglePlacesActivity</string>
+    <string name="label_btn_find">Find</string>
+</resources>
