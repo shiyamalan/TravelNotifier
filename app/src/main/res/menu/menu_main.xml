@@ -20,7 +20,15 @@
             android:title="Search Place"
             android:icon="@drawable/ic_action_search"
             app:showAsAction="ifRoom"
-            ></item>
+                ></item>
+        <item
+            android:id="@+id/action_clear"
+            android:orderInCategory="200"
+            android:title="Clear Place Selection"
+            android:icon="@drawable/places_ic_clear"
+            app:showAsAction="ifRoom">
+
+        </item>
 
 
 

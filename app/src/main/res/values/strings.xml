@@ -8,4 +8,15 @@
     <string name="title_back">Back</string>
     <string name="title_activity_google_places">GooglePlacesActivity</string>
     <string name="label_btn_find">Find</string>
+    <string name="GPSAlertDialogTitle">Alert Message</string>
+    <string name="GPSAlertDialogMessage">You have to enable for notification</string>
+    <string name="cancel">Cancel</string>
+    <string name="addToEvent">Add To Event List</string>
+    <string name="edit">Edit Message</string>
+    <string name="removeFromList">Remove From Event List</string>
+    <string name="title_activity_notification_receiver">NotificationReceiverActivity</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="confirmationTitle">Place Changed</string>
+    <string name="question1">Some Places are in out of order of path\\n. Do you want to continue?</string>
 </resources>

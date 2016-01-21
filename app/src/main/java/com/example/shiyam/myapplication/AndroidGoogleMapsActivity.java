@@ -13,7 +13,6 @@ import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
 
-import com.example.shiyam.myapplication.alert.AlertDialogManager;
 import com.example.shiyam.myapplication.models.PlaceArrayAdapter;
 import com.example.shiyam.myapplication.models.StaticData;
 import com.example.shiyam.myapplication.network.connection.ConnectionDetector;
@@ -72,7 +71,7 @@ public class AndroidGoogleMapsActivity extends FragmentActivity implements
 			boolean isInternetPresent = ConnectionDetector.isConnectingToInternet();
 			if (!isInternetPresent) {
 				// Alert Dialog Manager
-				AlertDialogManager alert = new AlertDialogManager();
+//				AlertDialogManager alert = new AlertDialogManager();
 				// Internet Connection is not present
 //				alert.showAlertDialog(StaticData.current_context, "Internet Connection Error",
 //						"Please connect to working Internet connection", false);

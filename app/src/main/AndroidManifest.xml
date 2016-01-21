@@ -36,6 +36,7 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -69,8 +70,17 @@
         <activity
             android:name=".PlaceSelectActivity"
             android:label="@string/title_activity_place_select"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"></activity>
 
+        <service
+            android:name=".GPSTrackerOwn"
+            android:enabled="true"
+            android:exported="true" />
+
+        <activity
+            android:name=".NotificationReceiverActivity"
+            android:label="@string/title_activity_notification_receiver"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

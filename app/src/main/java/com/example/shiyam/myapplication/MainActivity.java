@@ -1,13 +1,17 @@
 package com.example.shiyam.myapplication;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -69,6 +73,7 @@ public class MainActivity extends AppCompatActivity  implements
 
     GoogleMap map;
     Map<String,CustomMarker> markerPoints;
+    public static Map<String,CustomMarker> userSelectedPoints;
     private HashMap<CustomMarker, Marker> markersHashMap;
     private Iterator<Map.Entry<CustomMarker, Marker>> iter;
     private CameraUpdate cu;
@@ -133,14 +138,31 @@ public class MainActivity extends AppCompatActivity  implements
             public void onMapClick(LatLng point) {
                 int size = markerPoints.size();
                 if(size>1){
-                    map.clear();
-                    markerPoints.clear();
+//                    map.clear();
+//                    markerPoints.clear();
+                    String id =  point.latitude + " "+ point.latitude;
+                    CustomMarker customMarker = new CustomMarker(id,
+                            point.latitude, point.longitude);
+                    customMarker.setMarker(getMarker(customMarker, "User"));
+                    userSelectedPoints.put(id, customMarker);
+                    Marker marker = map.addMarker(getMarkerOptions(customMarker, "User"));
+                    marker.showInfoWindow();
+                    marker.setDraggable(true);
+
+                    startAnimation(customMarker);
+
+
+                    Button button = (Button) findViewById(R.id.button3);
+                    button.setEnabled(true);
                 }
                 size = markerPoints.size();
-                if(size == 0){
-                    setUpMarkers(point, "Start");
-                }else {
-                    setUpMarkers(point, "End");
+
+                if(size <2) {
+                    if (size == 0) {
+                        setUpMarkers(point, "Start");
+                    } else {
+                        setUpMarkers(point, "End");
+                    }
                 }
             }
         });
@@ -167,7 +189,7 @@ public class MainActivity extends AppCompatActivity  implements
 //        }
 //
 //        map.addMarker(options);
-        addMarker(id,customMarker);
+        addMarker(id,customMarker,"Nothing");
         startAnimation(customMarker);
 
         if(markerPoints.size() >= 2){
@@ -333,22 +355,21 @@ public class MainActivity extends AppCompatActivity  implements
                     LatLng position = new LatLng(lat, lng);
                     //Log.e("Latitude:" + point.get("lat"), "Longtitude:" + point.get("lng"));
                     points.add(position);
-
-//                    Log.e
                 }
                 // Adding all the points in the route to LineOptions
                 StaticData.points = points;
                 lineOptions.addAll(points);
                 lineOptions.width(8);
                 lineOptions.color(Color.BLUE);
-                Button button = (Button) findViewById(R.id.button3);
-                button.setEnabled(true);
+
+                Toast.makeText(MainActivity.this,"You can now select places on path",
+                        Toast.LENGTH_LONG);
             }
 
             // Drawing polyline in the Google Map for the i-th route
             map.addPolyline(lineOptions);
-            progressDialog.dismiss();
             FocusPlaces();
+            progressDialog.dismiss();
         }
     }
 
@@ -379,8 +400,12 @@ public class MainActivity extends AppCompatActivity  implements
             Button b = (Button) findViewById(R.id.button3);
             b.setEnabled(false);
             markerPoints.clear();
+            userSelectedPoints.clear();
             map.clear();
             return true;
+        }else if(id == R.id.action_clear){
+
+            userSelectedPoints.clear();
         }
 
         return super.onOptionsItemSelected(item);
@@ -390,6 +415,9 @@ public class MainActivity extends AppCompatActivity  implements
     public void setUpMarkersHashMap() {
         if (markerPoints == null) {
             markerPoints = new HashMap<String, CustomMarker>();
+        }
+        if(userSelectedPoints == null){
+            userSelectedPoints = new HashMap<>();
         }
     }
 
@@ -501,9 +529,8 @@ public class MainActivity extends AppCompatActivity  implements
     // this is method to help us find a Marker that is stored into the hashmap
     public Marker findMarker(CustomMarker customMarker) {
         Marker marker = null;
-        if(markerPoints != null) {
-            marker=  customMarker.getMarker();
-        }
+        marker = customMarker.getMarker();
+
         return  marker;
     }
 
@@ -581,23 +608,108 @@ public class MainActivity extends AppCompatActivity  implements
     }
 
     // this is method to help us add a Marker to the map
-    public void addMarker(String id,CustomMarker customMarker) {
-        MarkerOptions markerOption = new MarkerOptions().position(
-                new LatLng(customMarker.getCustomMarkerLatitude(), customMarker.getCustomMarkerLongitude())).icon(
-                BitmapDescriptorFactory.defaultMarker());
+    public void addMarker(String id,CustomMarker customMarker,String type) {
 
-        Marker newMark = map.addMarker(markerOption);
+        Marker marker = map.addMarker(getMarkerOptions(customMarker, type));
+        marker.showInfoWindow();
+        marker.setDraggable(true);
 
-        map.addMarker(markerOption);
-        customMarker.setMarker(newMark);
+        customMarker.setMarker(getMarker(customMarker,type));
         markerPoints.put(id, customMarker);
     }
+    private Marker getMarker(CustomMarker customMarker,String type){
+        MarkerOptions markerOption =getMarkerOptions(customMarker,type);
+        Marker newMark = map.addMarker(markerOption);
 
+        return newMark;
+    }
+
+    private MarkerOptions getMarkerOptions(CustomMarker customMarker, String type){
+
+        MarkerOptions markerOptions = new MarkerOptions();
+        LatLng pos = new LatLng(customMarker.getCustomMarkerLatitude(),
+                customMarker.getCustomMarkerLongitude());
+        markerOptions.position(pos);
+        markerOptions.title(AddressInfo.getAddress(pos));
+        markerOptions.snippet("Place Name");
+        if(type.equals("User")) {
+            markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.mark_blue));
+        }else{
+            markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.mark_red));
+        }
+        return markerOptions;
+
+    }
     public void LoadSubPlaces(View v){
         Button b = (Button)v;
         if(b.isEnabled()){
+
+
+            Map<String,CustomMarker> selectedPoints = MainActivity.userSelectedPoints;
+            List<CustomMarker> listPoint = new ArrayList<>(selectedPoints.values());
+
+            if(listPoint != null){
+                for(CustomMarker customMarker:listPoint){
+
+                    double lat = customMarker.getCustomMarkerLatitude();
+                    double lon = customMarker.getCustomMarkerLongitude();
+                    LatLng latLng = new LatLng(lat,lon);
+
+                    if(!isContainingPoints(latLng)){
+
+                        AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+
+                        //Setting Dialog Title
+                        alertDialog.setTitle(R.string.confirmationTitle);
+
+                        //Setting Dialog Message
+                        alertDialog.setMessage(R.string.question1);
+
+                        //On Pressing Setting button
+                        alertDialog.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                Intent intent = new Intent(MainActivity.this,PlaceSelectActivity.class);
+                                startActivity(intent);
+                            }
+                        });
+
+                        //On pressing cancel button
+                        alertDialog.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                dialog.cancel();
+                            }
+                        });
+                    }
+
+                }
+            }
             Intent intent = new Intent(MainActivity.this,PlaceSelectActivity.class);
             startActivity(intent);
+
         }
+    }
+
+
+    public static boolean isContainingPoints(LatLng point){
+
+        List<LatLng> points = StaticData.points;
+        boolean isContaining = false;
+
+        for(LatLng tempPoint:points){
+            double lat = tempPoint.latitude;
+            double lon = tempPoint.longitude;
+
+            if(lat == point.latitude && lon == point.longitude){
+                    isContaining = true;
+                    break;
+            }
+        }
+        return isContaining;
     }
 }
